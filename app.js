@@ -98,7 +98,10 @@ function renderLinks(type, gridId, filter = "") {
                     <div class="card-icon"><i class="fa-solid ${iconClass}"></i></div>
                     <div class="card-title">${link.title}</div>
                 </div>
-                <button class="btn-info" onclick="event.preventDefault(); showNote('${link.id}')"><i class="fa-solid fa-circle-exclamation"></i></button>
+                <div style="display: flex; gap: 8px;">
+                    <button class="btn-info" onclick="event.preventDefault(); copyToClipboard('${link.url}')" title="Copy URL"><i class="fa-regular fa-copy"></i></button>
+                    <button class="btn-info" onclick="event.preventDefault(); showNote('${link.id}')"><i class="fa-solid fa-circle-exclamation"></i></button>
+                </div>
             </div>
             <div class="card-desc">${link.desc || truncateNote(link.note)}</div>
             ${tagsHtml}
@@ -303,7 +306,12 @@ function renderAdminTable() {
         const tr = document.createElement('tr');
         tr.innerHTML = `
             <td><strong>${link.title}</strong></td>
-            <td><a href="${link.url}" target="_blank" style="color:var(--primary)">${link.url}</a></td>
+            <td>
+                <div style="display: flex; align-items: center; justify-content: space-between; gap: 5px;">
+                    <a href="${link.url}" target="_blank" style="color:var(--primary); word-break: break-all;">${link.url}</a>
+                    <button onclick="copyToClipboard('${link.url}')" title="Copy URL" style="background: transparent; border: none; color: var(--text-secondary); cursor: pointer; font-size: 1.1rem; padding: 4px;"><i class="fa-regular fa-copy"></i></button>
+                </div>
+            </td>
             <td>
                 ${link.desc || truncateNote(link.note)}
                 <div style="margin-top: 5px;">${(link.tags || []).map(t => `<span class="tag-pill">${t}</span>`).join(' ')}</div>
@@ -586,4 +594,24 @@ document.getElementById('login-pass').addEventListener('keypress', (e) => {
     if(e.key === 'Enter') document.getElementById('btn-login').click();
 });
 
+// Copy to clipboard helper
+window.copyToClipboard = function(text) {
+    navigator.clipboard.writeText(text).then(() => {
+        // Find existing toast or create one
+        let toast = document.getElementById('copy-toast');
+        if (!toast) {
+            toast = document.createElement('div');
+            toast.id = 'copy-toast';
+            toast.style.cssText = 'position: fixed; bottom: 20px; right: 20px; background: var(--primary); color: white; padding: 10px 20px; border-radius: 5px; z-index: 9999; transition: opacity 0.3s; opacity: 0; pointer-events: none; box-shadow: 0 4px 6px rgba(0,0,0,0.1);';
+            document.body.appendChild(toast);
+        }
+        toast.innerText = 'Đã copy đường dẫn!';
+        toast.style.opacity = '1';
+        setTimeout(() => { toast.style.opacity = '0'; }, 2000);
+    }).catch(err => {
+        alert('Không thể copy: ' + err);
+    });
+};
+
 // Do not call updateView() directly here, login logic handles initial view
+
