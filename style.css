@@ -643,3 +643,102 @@ tr:hover {
 .modal-actions button {
     width: auto;
 }
+
+/* Responsive Design / Mobile Optimization */
+.mobile-menu-btn {
+    display: none;
+}
+.sidebar-overlay {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    /* Hide sidebar, make it an offcanvas drawer */
+    .sidebar {
+        position: fixed;
+        left: -260px;
+        top: 0;
+        bottom: 0;
+        z-index: 1000;
+        transition: left 0.3s ease;
+    }
+    
+    .sidebar.active {
+        left: 0;
+    }
+    
+    /* Overlay */
+    .sidebar-overlay {
+        display: none;
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 999;
+        backdrop-filter: blur(2px);
+    }
+    
+    .sidebar-overlay.active {
+        display: block;
+    }
+    
+    /* Main content padding */
+    .main-content {
+        padding: 1rem;
+    }
+    
+    /* Header layout */
+    header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .header-actions {
+        width: 100%;
+        flex-direction: row;
+        justify-content: space-between;
+        flex-wrap: wrap;
+    }
+    
+    .search-bar {
+        width: 100%;
+        flex: 1;
+        min-width: 200px;
+    }
+    
+    /* Show mobile menu button */
+    .mobile-menu-btn {
+        display: flex;
+    }
+    
+    h1 {
+        font-size: 1.5rem;
+    }
+    
+    /* Grid */
+    .link-grid {
+        grid-template-columns: repeat(auto-fill, minmax(100%, 1fr));
+    }
+    
+    /* Admin Table scrolling */
+    .table-container {
+        overflow-x: auto;
+    }
+    
+    table {
+        min-width: 600px; /* force scrolling */
+    }
+    
+    /* Login card */
+    .login-card {
+        padding: 2rem 1.5rem;
+        width: 90%;
+    }
+    
+    /* Modal */
+    .modal-content {
+        padding: 1.5rem;
+    }
+}
+

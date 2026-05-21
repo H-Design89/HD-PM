@@ -36,6 +36,9 @@
     </div>
 
     <div class="app-container hidden" id="app-screen">
+        <!-- Sidebar Overlay -->
+        <div class="sidebar-overlay" id="sidebar-overlay"></div>
+        
         <!-- Sidebar / Navigation -->
         <nav class="sidebar">
             <div class="logo">
@@ -58,8 +61,11 @@
         <!-- Main Content Area -->
         <main class="main-content">
             <header>
-                <h1 id="page-title">Công cụ & Tiện ích</h1>
-                <div style="display: flex; gap: 1rem; align-items: center;">
+                <div class="header-title-area" style="display: flex; align-items: center; gap: 1rem;">
+                    <button class="btn-icon mobile-menu-btn" id="mobile-menu-btn"><i class="fa-solid fa-bars"></i></button>
+                    <h1 id="page-title">Công cụ & Tiện ích</h1>
+                </div>
+                <div class="header-actions" style="display: flex; gap: 1rem; align-items: center;">
                     <div class="view-toggle">
                         <button class="btn-icon active" id="btn-view-grid" title="Chế độ lưới"><i class="fa-solid fa-border-all"></i></button>
                         <button class="btn-icon" id="btn-view-list" title="Chế độ danh sách"><i class="fa-solid fa-list"></i></button>
