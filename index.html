@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HD Solution - Link Manager</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" type="image/png" href="logo.png">
+    <link rel="icon" type="image/x-icon" href="logo.ico">
+</head>
+<body>
+    <!-- Login Screen -->
+    <div class="login-screen" id="login-screen">
+        <div class="login-card">
+            <div class="logo" style="justify-content: center; margin-bottom: 1rem; border: none; padding: 0;">
+                <img src="logo.png" alt="HD Logo" id="login-app-logo" onerror="this.style.display='none'; document.getElementById('login-logo-icon').style.display='block';">
+                <i class="fa-solid fa-layer-group" id="login-logo-icon" style="display: none;"></i>
+                <h2>HD-PM</h2>
+            </div>
+            <h3>Đăng Nhập Hệ Thống</h3>
+            <p>Vui lòng nhập thông tin để tiếp tục</p>
+            <div class="form-group">
+                <input type="text" id="login-id" placeholder="Tài khoản (ID)">
+            </div>
+            <div class="form-group">
+                <input type="password" id="login-pass" placeholder="Mật khẩu">
+            </div>
+            <button class="btn primary" id="btn-login" style="margin-top: 1rem;">Đăng Nhập</button>
+            <p id="login-error" class="error-text"></p>
+        </div>
+    </div>
+
+    <div class="app-container hidden" id="app-screen">
+        <!-- Sidebar / Navigation -->
+        <nav class="sidebar">
+            <div class="logo">
+                <img src="logo.png" alt="HD Logo" id="app-logo" onerror="this.style.display='none'; document.getElementById('logo-icon').style.display='block';">
+                <i class="fa-solid fa-layer-group" id="logo-icon" style="display: none;"></i>
+                <h2>HD-PM</h2>
+            </div>
+            <ul class="nav-links">
+                <li class="active" data-tab="basic"><i class="fa-solid fa-globe"></i> Cơ bản</li>
+                <li data-tab="advanced"><i class="fa-solid fa-lock"></i> Nâng cao</li>
+                <li data-tab="admin" id="nav-tab-admin"><i class="fa-solid fa-gear"></i> Quản trị</li>
+                <li id="nav-setup" style="margin-top: auto; color: #2ecc71;"><i class="fa-solid fa-desktop"></i> Tạo Icon (PC)</li>
+                <li id="nav-logout" style="color: var(--danger); margin-top: 10px;"><i class="fa-solid fa-right-from-bracket"></i> Đăng xuất</li>
+            </ul>
+            <div class="sidebar-footer">
+                Solution by H-DESIGN @2026
+            </div>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <header>
+                <h1 id="page-title">Công cụ & Tiện ích</h1>
+                <div style="display: flex; gap: 1rem; align-items: center;">
+                    <div class="view-toggle">
+                        <button class="btn-icon active" id="btn-view-grid" title="Chế độ lưới"><i class="fa-solid fa-border-all"></i></button>
+                        <button class="btn-icon" id="btn-view-list" title="Chế độ danh sách"><i class="fa-solid fa-list"></i></button>
+                    </div>
+                    <div class="search-bar">
+                        <i class="fa-solid fa-search"></i>
+                        <input type="text" id="search-input" placeholder="Tìm kiếm ứng dụng...">
+                    </div>
+                </div>
+            </header>
+
+            <!-- Views -->
+            <div id="view-basic" class="view active">
+                <div class="tag-filter-bar" id="tags-basic"></div>
+                <div class="link-grid" id="grid-basic"></div>
+            </div>
+
+            <div id="view-advanced" class="view">
+                <div class="tag-filter-bar" id="tags-advanced"></div>
+                <div class="link-grid" id="grid-advanced"></div>
+            </div>
+
+            <div id="view-admin" class="view">
+                <div class="admin-panel" id="panel-admin">
+                    <div class="admin-actions">
+                        <button class="btn success" id="btn-add-link"><i class="fa-solid fa-plus"></i> Thêm Link Mới</button>
+                        <button class="btn danger" id="btn-export-data"><i class="fa-solid fa-download"></i> Xuất Data.js</button>
+                    </div>
+                    
+                    <div class="admin-tabs" style="display: flex; gap: 1rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">
+                        <button class="tab-btn active" data-target="admin-links-tab" style="background:transparent; border:none; color:var(--text-secondary); cursor:pointer; font-size:1rem; font-weight:600;">Quản lý Link</button>
+                        <button class="tab-btn" data-target="admin-users-tab" style="background:transparent; border:none; color:var(--text-secondary); cursor:pointer; font-size:1rem; font-weight:600;">Quản lý User</button>
+                    </div>
+
+                    <div id="admin-links-tab" class="admin-tab-content active">
+                        <div class="table-container">
+                            <table id="links-table">
+                                <thead>
+                                    <tr>
+                                        <th>Tên ứng dụng</th>
+                                        <th>URL</th>
+                                        <th>Mô tả & Tags</th>
+                                        <th>Loại</th>
+                                        <th>Ngày thêm</th>
+                                        <th>Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="links-tbody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div id="admin-users-tab" class="admin-tab-content" style="display:none;">
+                        <button class="btn success mb-4" id="btn-add-user" style="margin-bottom: 1rem;"><i class="fa-solid fa-plus"></i> Thêm User Mới</button>
+                        <div class="table-container">
+                            <table id="users-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Tên hiển thị</th>
+                                        <th>Mật khẩu</th>
+                                        <th>Quyền</th>
+                                        <th>Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="users-tbody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal Form -->
+    <div class="modal-overlay" id="link-modal">
+        <div class="modal-content">
+            <h3 id="modal-title">Thêm Link Mới</h3>
+            <input type="hidden" id="form-id">
+            <div class="form-group">
+                <label>Tên ứng dụng:</label>
+                <input type="text" id="form-title" placeholder="VD: Google">
+            </div>
+            <div class="form-group">
+                <label>Đường dẫn (URL):</label>
+                <input type="text" id="form-url" placeholder="VD: https://google.com">
+            </div>
+            <div class="form-group">
+                <label>Mô tả ngắn:</label>
+                <input type="text" id="form-desc" placeholder="Công cụ tìm kiếm...">
+            </div>
+            <div class="form-group">
+                <label>Ghi chú chi tiết:</label>
+                <textarea id="form-note" placeholder="Nhập ghi chú dài ở đây..." rows="4" style="width:100%; padding:0.8rem; background:rgba(0,0,0,0.2); color:white; border:1px solid rgba(255,255,255,0.1); border-radius:6px; resize:vertical;"></textarea>
+            </div>
+            <div class="form-group">
+                <label>Chọn Icon:</label>
+                <div class="icon-picker" id="icon-picker">
+                    <div class="icon-option active" data-icon="fa-globe"><i class="fa-solid fa-globe"></i></div>
+                    <div class="icon-option" data-icon="fa-server"><i class="fa-solid fa-server"></i></div>
+                    <div class="icon-option" data-icon="fa-cloud"><i class="fa-solid fa-cloud"></i></div>
+                    <div class="icon-option" data-icon="fa-database"><i class="fa-solid fa-database"></i></div>
+                    <div class="icon-option" data-icon="fa-chart-pie"><i class="fa-solid fa-chart-pie"></i></div>
+                    <div class="icon-option" data-icon="fa-laptop-code"><i class="fa-solid fa-laptop-code"></i></div>
+                    <div class="icon-option" data-icon="fa-book"><i class="fa-solid fa-book"></i></div>
+                    <div class="icon-option" data-icon="fa-file-lines"><i class="fa-solid fa-file-lines"></i></div>
+                    <div class="icon-option" data-icon="fa-envelope"><i class="fa-solid fa-envelope"></i></div>
+                    <div class="icon-option" data-icon="fa-box"><i class="fa-solid fa-box"></i></div>
+                </div>
+                <input type="hidden" id="form-icon" value="fa-globe">
+            </div>
+            <div class="form-group">
+                <label>Thẻ Tags (Phân cách bằng dấu phẩy):</label>
+                <input type="text" id="form-tags" placeholder="VD: Học tập, Làm việc, AI">
+            </div>
+            <div class="form-group">
+                <label>Loại (Quyền truy cập):</label>
+                <select id="form-type">
+                    <option value="basic">Cơ bản (Công khai)</option>
+                    <option value="advanced">Nâng cao (Cần mật khẩu)</option>
+                </select>
+            </div>
+            <div class="modal-actions">
+                <button class="btn outline" id="btn-cancel-modal">Hủy</button>
+                <button class="btn primary" id="btn-save-modal">Lưu lại</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Note Modal -->
+    <div class="modal-overlay" id="note-modal">
+        <div class="modal-content">
+            <h3 id="note-modal-title" style="margin-bottom: 1rem;">Chi tiết</h3>
+            <p id="note-modal-content" style="color: var(--text-secondary); line-height: 1.6; margin-bottom: 2rem; white-space: pre-wrap;"></p>
+            <div class="modal-actions">
+                <button class="btn primary" id="btn-close-note">Đóng</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Modal -->
+    <div class="modal-overlay" id="user-modal">
+        <div class="modal-content">
+            <h3 id="user-modal-title">Thêm User Mới</h3>
+            <input type="hidden" id="form-user-edit-id">
+            <div class="form-group">
+                <label>ID Đăng nhập:</label>
+                <input type="text" id="form-user-id" placeholder="VD: user1">
+            </div>
+            <div class="form-group">
+                <label>Tên hiển thị:</label>
+                <input type="text" id="form-user-name" placeholder="VD: Khách">
+            </div>
+            <div class="form-group">
+                <label>Mật khẩu:</label>
+                <input type="text" id="form-user-pass">
+            </div>
+            <div class="form-group">
+                <label>Quyền hạn:</label>
+                <select id="form-user-role">
+                    <option value="basic">Cơ bản (Chỉ xem link thường)</option>
+                    <option value="advanced">Nâng cao (Xem link VIP)</option>
+                    <option value="admin">Quản trị viên (Toàn quyền)</option>
+                </select>
+            </div>
+            <div class="modal-actions">
+                <button class="btn outline" id="btn-cancel-user">Hủy</button>
+                <button class="btn primary" id="btn-save-user">Lưu lại</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
