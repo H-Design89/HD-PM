@@ -307,9 +307,9 @@ function renderAdminTable() {
         tr.innerHTML = `
             <td><strong>${link.title}</strong></td>
             <td>
-                <div style="display: flex; align-items: center; justify-content: space-between; gap: 5px;">
-                    <a href="${link.url}" target="_blank" style="color:var(--primary); word-break: break-all;">${link.url}</a>
-                    <button onclick="copyToClipboard('${link.url}')" title="Copy URL" style="background: transparent; border: none; color: var(--text-secondary); cursor: pointer; font-size: 1.1rem; padding: 4px;"><i class="fa-regular fa-copy"></i></button>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <a href="${link.url}" target="_blank" class="btn outline" style="padding: 4px 12px; font-size: 0.85rem; text-decoration: none; border-color: var(--border-color); color: var(--text-primary);"><i class="fa-solid fa-arrow-up-right-from-square" style="margin-right: 5px;"></i> Mở Link</a>
+                    <button onclick="copyToClipboard('${link.url}')" title="Copy URL" style="background: transparent; border: none; color: var(--text-secondary); cursor: pointer; font-size: 1.1rem; padding: 4px; transition: color 0.2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-secondary)'"><i class="fa-regular fa-copy"></i></button>
                 </div>
             </td>
             <td>
