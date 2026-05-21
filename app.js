@@ -100,7 +100,7 @@ function renderLinks(type, gridId, filter = "") {
                 </div>
                 <button class="btn-info" onclick="event.preventDefault(); showNote('${link.id}')"><i class="fa-solid fa-circle-exclamation"></i></button>
             </div>
-            <div class="card-desc">${truncateNote(link.note)}</div>
+            <div class="card-desc">${link.desc || truncateNote(link.note)}</div>
             ${tagsHtml}
             ${timeHtml}
         `;
@@ -305,7 +305,7 @@ function renderAdminTable() {
             <td><strong>${link.title}</strong></td>
             <td><a href="${link.url}" target="_blank" style="color:var(--primary)">${link.url}</a></td>
             <td>
-                ${truncateNote(link.note)}
+                ${link.desc || truncateNote(link.note)}
                 <div style="margin-top: 5px;">${(link.tags || []).map(t => `<span class="tag-pill">${t}</span>`).join(' ')}</div>
             </td>
             <td><span class="badge ${link.type}">${link.type === 'basic' ? 'Cơ bản' : 'Nâng cao'}</span></td>
@@ -358,6 +358,7 @@ document.getElementById('btn-add-link').addEventListener('click', () => {
     document.getElementById('form-id').value = '';
     document.getElementById('form-title').value = '';
     document.getElementById('form-url').value = '';
+    document.getElementById('form-desc').value = '';
     document.getElementById('form-note').value = '';
     document.getElementById('form-tags').value = '';
     document.getElementById('form-type').value = 'basic';
@@ -367,8 +368,38 @@ document.getElementById('btn-add-link').addEventListener('click', () => {
     iconOptions[0].classList.add('active');
     document.getElementById('form-icon').value = iconOptions[0].dataset.icon;
     
+    renderTagSuggestions();
+    
     modal.classList.add('active');
 });
+
+function renderTagSuggestions() {
+    const container = document.getElementById('tag-suggestions');
+    if (!container) return;
+    
+    const allTags = new Set();
+    localData.links.forEach(l => {
+        if (l.tags) l.tags.forEach(t => allTags.add(t));
+    });
+    
+    container.innerHTML = '';
+    Array.from(allTags).sort().forEach(tag => {
+        const pill = document.createElement('span');
+        pill.className = 'tag-pill';
+        pill.style.cursor = 'pointer';
+        pill.innerText = tag;
+        pill.title = 'Bấm để thêm tag này';
+        pill.onclick = () => {
+            const input = document.getElementById('form-tags');
+            let current = input.value.split(',').map(t => t.trim()).filter(t => t);
+            if (!current.includes(tag)) {
+                current.push(tag);
+                input.value = current.join(', ');
+            }
+        };
+        container.appendChild(pill);
+    });
+}
 
 document.getElementById('btn-cancel-modal').addEventListener('click', () => {
     modal.classList.remove('active');
@@ -378,6 +409,7 @@ document.getElementById('btn-save-modal').addEventListener('click', () => {
     const id = document.getElementById('form-id').value;
     const title = document.getElementById('form-title').value;
     const url = document.getElementById('form-url').value;
+    const desc = document.getElementById('form-desc').value;
     const note = document.getElementById('form-note').value;
     const tagsRaw = document.getElementById('form-tags').value;
     const type = document.getElementById('form-type').value;
@@ -398,13 +430,13 @@ document.getElementById('btn-save-modal').addEventListener('click', () => {
         const index = localData.links.findIndex(l => l.id === id);
         if (index !== -1) {
             const oldCreatedAt = localData.links[index].createdAt || new Date().toLocaleDateString('vi-VN');
-            localData.links[index] = { id, title, url, note, tags, type, icon, createdAt: oldCreatedAt };
+            localData.links[index] = { id, title, url, desc, note, tags, type, icon, createdAt: oldCreatedAt };
         }
     } else {
         // Add new
         const newId = Date.now().toString();
         const createdAt = new Date().toLocaleDateString('vi-VN');
-        localData.links.push({ id: newId, title, url, note, tags, type, icon, createdAt });
+        localData.links.push({ id: newId, title, url, desc, note, tags, type, icon, createdAt });
     }
     
     modal.classList.remove('active');
@@ -419,6 +451,7 @@ window.editLink = function(id) {
         document.getElementById('form-id').value = link.id;
         document.getElementById('form-title').value = link.title;
         document.getElementById('form-url').value = link.url;
+        document.getElementById('form-desc').value = link.desc || '';
         document.getElementById('form-note').value = link.note || '';
         document.getElementById('form-tags').value = (link.tags || []).join(', ');
         document.getElementById('form-type').value = link.type;
@@ -430,6 +463,8 @@ window.editLink = function(id) {
         const opt = Array.from(iconOptions).find(o => o.dataset.icon === iconVal);
         if(opt) opt.classList.add('active');
         else if(iconOptions.length > 0) iconOptions[0].classList.add('active');
+        
+        renderTagSuggestions();
         
         modal.classList.add('active');
     }

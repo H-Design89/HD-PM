@@ -3,7 +3,7 @@ const appData = {
         {
             "id": "admin",
             "name": "Admin",
-            "password": "123",
+            "password": "zodiac1612@",
             "role": "admin"
         },
         {
@@ -49,7 +49,8 @@ const appData = {
             "id": "3",
             "title": "DESIGN-ENGINEERING-HUB-V2.1.26",
             "url": "https://h-design89.github.io/DESIGN-ENGINEERING-HUB-V2.1.26/",
-            "note": "Trung tâm thiết kế dàn trao đổi nhiệt.",
+            "desc": "Trung tâm thiết kế dàn trao đổi nhiệt.",
+            "note": "admin\nzodiac1612@",
             "tags": [
                 "Làm việc",
                 "Thiết kế",
@@ -63,7 +64,8 @@ const appData = {
             "id": "1779352175647",
             "title": "GTspecboard",
             "url": "https://h-design89.github.io/GTspecboard/",
-            "note": "Tập hợp và thống kê các thiết kế của GT",
+            "desc": "Tập hợp và thống kê các thiết kế của GT",
+            "note": "admin\nzodiac1612@",
             "tags": [
                 "Làm việc",
                 "Tra cứu",
@@ -71,6 +73,56 @@ const appData = {
             ],
             "type": "advanced",
             "icon": "fa-file-lines",
+            "createdAt": "21/5/2026"
+        },
+        {
+            "id": "1779352563367",
+            "title": "HD-PM",
+            "url": "https://h-design89.github.io/HD-PM/",
+            "desc": "Quản lý tất cả các dự án WebApp",
+            "note": "admin\nzodiac1612@",
+            "tags": [
+                "Quản lý"
+            ],
+            "type": "advanced",
+            "icon": "fa-globe",
+            "createdAt": "21/5/2026"
+        },
+        {
+            "id": "1779353210692",
+            "title": "Github",
+            "url": "https://github.com/",
+            "desc": "Chuyển App thành WebApp",
+            "note": "4bgoat@gmail.com\nNew>Copy link thư viện vào Antigravity cho up lên> vào lại trang chọn Setting> Main> Save\nChờ xuất hiện link\n",
+            "tags": [
+                "Công cụ"
+            ],
+            "type": "basic",
+            "icon": "fa-globe",
+            "createdAt": "21/5/2026"
+        },
+        {
+            "id": "1779353273798",
+            "title": "Convertio",
+            "url": "https://convertio.co/vn/download/9861b879a1818e4e498f7a5c4e1ac3a8840e65/",
+            "desc": "Chuyển đuôi ảnh .PNG thành icon đuôi .ICO",
+            "note": "",
+            "tags": [
+                "Công cụ"
+            ],
+            "type": "basic",
+            "icon": "fa-globe",
+            "createdAt": "21/5/2026"
+        },
+        {
+            "id": "1779353761864",
+            "title": "DESIGN-ENGINEERING-HUB",
+            "url": "https://h-design89.github.io/DESIGN-ENGINEERING-HUB.F/",
+            "desc": "Trung tâm thiết kế dàn trao đổi nhiệt và thống kê các thiết kế ",
+            "note": "",
+            "tags": [],
+            "type": "basic",
+            "icon": "fa-database",
             "createdAt": "21/5/2026"
         }
     ]
