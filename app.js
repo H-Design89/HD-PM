@@ -227,63 +227,6 @@ document.getElementById('nav-logout').addEventListener('click', () => {
     document.getElementById('login-pass').value = '';
 });
 
-// Setup Desktop Icon Logic
-document.getElementById('nav-setup').addEventListener('click', () => {
-    const currentUrl = window.location.href;
-    
-    let iconScript = "";
-    if (window.location.protocol === 'file:') {
-        let localPath = window.location.pathname;
-        if (localPath.startsWith('/')) {
-            localPath = localPath.substring(1);
-        }
-        localPath = decodeURIComponent(localPath).replace(/\//g, '\\\\');
-        localPath = localPath.substring(0, localPath.lastIndexOf('\\\\'));
-        iconScript = `
-iconFile = "${localPath}\\\\logo.ico"
-If objFSO.FileExists(iconFile) Then
-    objShortcut.IconLocation = iconFile
-End If
-`;
-    }
-
-    const vbsCode = `Set objShell = WScript.CreateObject("WScript.Shell")
-Set objFSO = CreateObject("Scripting.FileSystemObject")
-strDesktop = objShell.SpecialFolders("Desktop")
-Set objShortcut = objShell.CreateShortcut(strDesktop & "\\HD-PM.lnk")
-
-strChrome = "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
-strChrome86 = "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe"
-strEdge = "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe"
-
-If objFSO.FileExists(strChrome) Then
-    objShortcut.TargetPath = strChrome
-    objShortcut.Arguments = "--app=""" & "${currentUrl}" & """"
-ElseIf objFSO.FileExists(strChrome86) Then
-    objShortcut.TargetPath = strChrome86
-    objShortcut.Arguments = "--app=""" & "${currentUrl}" & """"
-ElseIf objFSO.FileExists(strEdge) Then
-    objShortcut.TargetPath = strEdge
-    objShortcut.Arguments = "--app=""" & "${currentUrl}" & """"
-Else
-    objShortcut.TargetPath = "${currentUrl}"
-End If
-${iconScript}
-objShortcut.WindowStyle = 3
-objShortcut.Save
-MsgBox "Da tao thanh cong Shortcut HD-PM ra Desktop (Che do App Mode)!", vbInformation, "H-DESIGN"
-`;
-    
-    const blob = new Blob([vbsCode], { type: 'text/vbs' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'setup_hd_hub.vbs';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-});
 
 // Admin Panel Logic
 const adminTabBtns = document.querySelectorAll('.admin-tabs .tab-btn');

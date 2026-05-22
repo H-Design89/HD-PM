@@ -742,3 +742,37 @@ tr:hover {
     }
 }
 
+/* Nút Install App Hiện Đại */
+.btn-install-app {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 22px;
+  background: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%);
+  color: #ffffff;
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: 50px;
+  box-shadow: 0 4px 15px rgba(0, 114, 255, 0.35);
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+.btn-install-app:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(0, 114, 255, 0.5);
+  background: linear-gradient(135deg, #00b4ec 0%, #0063e0 100%);
+  color: #ffffff;
+}
+
+.btn-install-app:active {
+  transform: translateY(1px);
+  box-shadow: 0 2px 10px rgba(0, 114, 255, 0.3);
+}
+
+.btn-install-app .icon {
+  font-size: 16px;
+}
+
