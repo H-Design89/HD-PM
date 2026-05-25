@@ -124,6 +124,36 @@ const appData = {
             "type": "basic",
             "icon": "fa-database",
             "createdAt": "21/5/2026"
+        },
+        {
+            "id": "1779437004502",
+            "title": "HD-CRM",
+            "url": "https://h-design89.github.io/HD-CRM/",
+            "desc": "Quản lý công ty",
+            "note": "Quản lý khách hàng, kho hàng, tạo báo giá",
+            "tags": [
+                "Công cụ",
+                "Quản lý",
+                "Làm việc"
+            ],
+            "type": "advanced",
+            "icon": "fa-file-lines",
+            "createdAt": "22/5/2026"
+        },
+        {
+            "id": "1779437180952",
+            "title": "Dwgfastview",
+            "url": "https://en.dwgfastview.com/",
+            "desc": "Xem và chỉnh sửa file bản vẽ",
+            "note": "Xem và chỉnh sửa file bản vẽ trên điện thoại, web. Cần nâng cấp quyền truy cập",
+            "tags": [
+                "Công cụ",
+                "Thiết kế",
+                "Làm việc"
+            ],
+            "type": "basic",
+            "icon": "fa-globe",
+            "createdAt": "22/5/2026"
         }
     ]
 };
