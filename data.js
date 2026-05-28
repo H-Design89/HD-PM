@@ -1,3 +1,7 @@
+// Thay đường link Google Apps Script Web App của bạn vào đây
+// Ví dụ: const GOOGLE_SHEET_API_URL = "https://script.google.com/macros/s/AKfycby.../exec";
+const GOOGLE_SHEET_API_URL = "https://script.google.com/macros/s/AKfycbw3NkPN2Gze6Rl_VjqR0U5HmKSs_-eemjqLFuGjbL-tI-b9JQ8N9t_2wTJzuvQFPPR3zg/exec"; 
+
 const appData = {
     "users": [
         {
@@ -154,6 +158,21 @@ const appData = {
             "type": "basic",
             "icon": "fa-globe",
             "createdAt": "22/5/2026"
+        },
+        {
+            "id": "1779683112523",
+            "title": "HD-MYLIFE",
+            "url": " https://h-design89.github.io/HD-Mylife/",
+            "desc": "",
+            "note": "Lên kế hoạch công việc và các dự án đang theo dõi",
+            "tags": [
+                "Công cụ",
+                "Làm việc",
+                "Quản lý"
+            ],
+            "type": "advanced",
+            "icon": "fa-file-lines",
+            "createdAt": "25/5/2026"
         }
     ]
 };

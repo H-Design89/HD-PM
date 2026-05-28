@@ -776,3 +776,78 @@ tr:hover {
   font-size: 16px;
 }
 
+/* Global Loader */
+.global-loader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(15, 23, 42, 0.8);
+    backdrop-filter: blur(5px);
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: white;
+}
+.global-loader.hidden {
+    display: none;
+}
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    border-top-color: #00c6ff;
+    animation: spin 1s ease-in-out infinite;
+    margin-bottom: 1rem;
+}
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Toast Auto-Save */
+#save-toast {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    background: var(--panel-bg);
+    color: var(--text-primary);
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    z-index: 9999;
+    transition: all 0.3s ease;
+    opacity: 0;
+    transform: translateY(20px);
+    pointer-events: none;
+}
+#save-toast.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+#save-toast .toast-icon {
+    color: var(--primary);
+}
+
+/* Star Feature */
+.star-btn {
+    transition: all 0.3s;
+}
+.star-btn:hover {
+    transform: scale(1.1);
+}
+.star-btn.active {
+    color: #eab308 !important;
+    text-shadow: 0 0 10px rgba(234, 179, 8, 0.4);
+}
+.card-header-actions {
+    display: flex;
+    gap: 8px;
+}

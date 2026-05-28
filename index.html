@@ -14,6 +14,12 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
 </head>
 <body>
+    <!-- Global Loading Spinner -->
+    <div id="global-loader" class="global-loader hidden">
+        <div class="spinner"></div>
+        <div class="loader-text" id="loader-text">Đang tải dữ liệu...</div>
+    </div>
+
     <!-- Login Screen -->
     <div class="login-screen" id="login-screen">
         <div class="login-card">
@@ -50,7 +56,19 @@
                 <li class="active" data-tab="basic"><i class="fa-solid fa-globe"></i> Cơ bản</li>
                 <li data-tab="advanced"><i class="fa-solid fa-lock"></i> Nâng cao</li>
                 <li data-tab="admin" id="nav-tab-admin"><i class="fa-solid fa-gear"></i> Quản trị</li>
-                <li id="nav-logout" style="color: var(--danger); margin-top: auto;"><i class="fa-solid fa-right-from-bracket"></i> Đăng xuất</li>
+                
+                <!-- Cloud Capacity Bar (Sidebar) -->
+                <div class="capacity-container" style="margin-top: auto; margin-bottom: 1rem; padding: 0 1rem;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px; font-weight: 500; font-size: 0.8rem; color: var(--text-secondary);">
+                        <span><i class="fa-solid fa-cloud" style="color: var(--primary); margin-right: 5px;"></i> Lưu trữ</span>
+                        <span id="capacity-text">0%</span>
+                    </div>
+                    <div class="progress-bar" style="width: 100%; height: 5px; background: rgba(255,255,255,0.05); border-radius: 10px; overflow: hidden;">
+                        <div class="progress-fill" id="capacity-fill" style="height: 100%; width: 0%; background: var(--success); transition: width 0.3s, background-color 0.3s;"></div>
+                    </div>
+                </div>
+
+                <li id="nav-logout" style="color: var(--danger);"><i class="fa-solid fa-right-from-bracket"></i> Đăng xuất</li>
             </ul>
             <div class="sidebar-footer">
                 Solution by H-DESIGN @2026
@@ -65,10 +83,6 @@
                     <h1 id="page-title">Công cụ & Tiện ích</h1>
                 </div>
                 <div class="header-actions" style="display: flex; gap: 1rem; align-items: center;">
-                    <a href="App_Installer.zip" download class="btn-install-app">
-                        <span class="icon">💻</span>
-                        <span class="text">Install App</span>
-                    </a>
                     <div class="view-toggle">
                         <button class="btn-icon active" id="btn-view-grid" title="Chế độ lưới"><i class="fa-solid fa-border-all"></i></button>
                         <button class="btn-icon" id="btn-view-list" title="Chế độ danh sách"><i class="fa-solid fa-list"></i></button>
@@ -95,7 +109,11 @@
                 <div class="admin-panel" id="panel-admin">
                     <div class="admin-actions">
                         <button class="btn success" id="btn-add-link"><i class="fa-solid fa-plus"></i> Thêm Link Mới</button>
-                        <button class="btn danger" id="btn-export-data"><i class="fa-solid fa-download"></i> Xuất Data.js</button>
+                        <button class="btn danger" id="btn-export-data"><i class="fa-solid fa-cloud-arrow-up"></i> Lưu Lên Cloud</button>
+                        <a href="App_Installer.zip" download class="btn-install-app">
+                            <span class="icon">💻</span>
+                            <span class="text">Install App</span>
+                        </a>
                     </div>
                     
                     <div class="admin-tabs" style="display: flex; gap: 1rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">

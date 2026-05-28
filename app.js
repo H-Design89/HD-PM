@@ -1,7 +1,117 @@
 // State
-let localData = JSON.parse(JSON.stringify(appData));
+let localData = { users: [], links: [] };
 let currentTab = 'basic';
 let currentUser = null;
+
+// Initialize Data
+async function initData() {
+    if (typeof GOOGLE_SHEET_API_URL !== 'undefined' && GOOGLE_SHEET_API_URL.trim() !== "") {
+        showLoader("Đang tải dữ liệu từ Cloud...");
+        try {
+            const res = await fetch(GOOGLE_SHEET_API_URL);
+            const data = await res.json();
+            if (data.users && data.users.length > 0) {
+                localData = data;
+            } else {
+                // Lần chạy đầu tiên trên sheet mới (chưa có data), dùng tạm appData
+                localData = JSON.parse(JSON.stringify(appData));
+            }
+        } catch (err) {
+            console.error("Lỗi khi tải dữ liệu Cloud:", err);
+            localData = JSON.parse(JSON.stringify(appData));
+            alert("Lỗi kết nối Cloud, đang dùng dữ liệu offline!");
+        } finally {
+            hideLoader();
+        }
+    } else {
+        // Fallback to local data
+        localData = JSON.parse(JSON.stringify(appData));
+    }
+    updateCapacity();
+}
+
+function showLoader(msg = "Đang xử lý...") {
+    const loader = document.getElementById('global-loader');
+    if (loader) {
+        document.getElementById('loader-text').innerText = msg;
+        loader.classList.remove('hidden');
+    }
+}
+
+function hideLoader() {
+    const loader = document.getElementById('global-loader');
+    if (loader) loader.classList.add('hidden');
+}
+
+function updateCapacity() {
+    if (!localData || !localData.links || !localData.users) return;
+    const total = localData.links.length + localData.users.length;
+    const text = document.getElementById('capacity-text');
+    const fill = document.getElementById('capacity-fill');
+    if(text && fill) {
+        const percent = Math.min((total / 5000) * 100, 100);
+        text.innerText = `${Math.round(percent)}%`;
+        fill.style.width = `${percent}%`;
+        fill.style.backgroundColor = (total >= 4000) ? 'var(--danger)' : (total >= 2000 ? '#eab308' : 'var(--success)');
+    }
+}
+
+let autoSaveTimer = null;
+function autoSaveToCloud() {
+    updateCapacity();
+    if (typeof GOOGLE_SHEET_API_URL === 'undefined' || GOOGLE_SHEET_API_URL.trim() === "") return;
+    
+    let toast = document.getElementById('save-toast');
+    if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'save-toast';
+        toast.innerHTML = `<i class="fa-solid fa-spinner fa-spin toast-icon"></i> <span>Đang lưu tự động...</span>`;
+        document.body.appendChild(toast);
+    }
+    toast.classList.add('show');
+    toast.querySelector('span').innerText = "Đang lưu tự động...";
+    toast.querySelector('i').className = "fa-solid fa-spinner fa-spin toast-icon";
+    toast.querySelector('i').style.color = "var(--primary)";
+    
+    if(autoSaveTimer) clearTimeout(autoSaveTimer);
+    autoSaveTimer = setTimeout(async () => {
+        try {
+            const res = await fetch(GOOGLE_SHEET_API_URL, {
+                method: 'POST',
+                body: JSON.stringify(localData)
+            });
+            const result = await res.json();
+            if (result.status === "success") {
+                toast.querySelector('span').innerText = "Đã lưu thành công";
+                toast.querySelector('i').className = "fa-solid fa-check toast-icon";
+                toast.querySelector('i').style.color = "var(--success)";
+            } else {
+                toast.querySelector('span').innerText = "Lỗi khi lưu";
+                toast.querySelector('i').className = "fa-solid fa-triangle-exclamation toast-icon";
+                toast.querySelector('i').style.color = "var(--danger)";
+            }
+        } catch (err) {
+            toast.querySelector('span').innerText = "Lỗi kết nối";
+            toast.querySelector('i').className = "fa-solid fa-triangle-exclamation toast-icon";
+            toast.querySelector('i').style.color = "var(--danger)";
+        } finally {
+            setTimeout(() => { toast.classList.remove('show'); }, 3000);
+        }
+    }, 1500); 
+}
+
+window.toggleStar = function(id) {
+    const link = localData.links.find(l => l.id === id);
+    if(link) {
+        const isStarred = (link.starred === true || link.starred === 'true');
+        link.starred = !isStarred;
+        updateView();
+        autoSaveToCloud();
+    }
+};
+
+// Call init on load
+initData();
 
 // DOM Elements
 const navLinks = document.querySelectorAll('.nav-links li');
@@ -75,6 +185,14 @@ function renderLinks(type, gridId, filter = "") {
         );
     }
     
+    filteredLinks.sort((a, b) => {
+        const aStarred = (a.starred === true || a.starred === 'true');
+        const bStarred = (b.starred === true || b.starred === 'true');
+        if (aStarred && !bStarred) return -1;
+        if (!aStarred && bStarred) return 1;
+        return 0;
+    });
+    
     filteredLinks.forEach(link => {
         const card = document.createElement('a');
         card.className = 'link-card';
@@ -90,7 +208,29 @@ function renderLinks(type, gridId, filter = "") {
             tagsHtml = `<div class="card-tags">${link.tags.map(t => `<span class="tag-pill">${t}</span>`).join('')}</div>`;
         }
         
-        const timeHtml = link.createdAt ? `<div class="card-time"><i class="fa-regular fa-clock"></i> ${link.createdAt}</div>` : '';
+        let timeText = link.createdAt || '';
+        if (timeText && timeText !== '-') {
+            if (timeText.includes('/')) {
+                const parts = timeText.split('/');
+                if (parts.length === 3) {
+                    const d = parts[0].padStart(2, '0');
+                    const m = parts[1].padStart(2, '0');
+                    const y = parts[2].length === 4 ? parts[2].slice(-2) : parts[2];
+                    timeText = `${d}/${m}/${y}`;
+                }
+            } else {
+                const dateObj = new Date(timeText);
+                if (!isNaN(dateObj.getTime())) {
+                    const d = String(dateObj.getDate()).padStart(2, '0');
+                    const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+                    const y = String(dateObj.getFullYear()).slice(-2);
+                    timeText = `${d}/${m}/${y}`;
+                }
+            }
+        }
+        const timeHtml = timeText ? `<div class="card-time"><i class="fa-regular fa-clock"></i> ${timeText}</div>` : '';
+        
+        const isStarred = (link.starred === true || link.starred === 'true');
         
         card.innerHTML = `
             <div class="card-header" style="justify-content: space-between;">
@@ -98,7 +238,8 @@ function renderLinks(type, gridId, filter = "") {
                     <div class="card-icon"><i class="fa-solid ${iconClass}"></i></div>
                     <div class="card-title">${link.title}</div>
                 </div>
-                <div style="display: flex; gap: 8px;">
+                <div class="card-header-actions">
+                    <button class="btn-info star-btn ${isStarred ? 'active' : ''}" onclick="event.preventDefault(); toggleStar('${link.id}')" title="Yêu thích"><i class="${isStarred ? 'fa-solid' : 'fa-regular'} fa-star"></i></button>
                     <button class="btn-info" onclick="event.preventDefault(); copyToClipboard('${link.url}')" title="Copy URL"><i class="fa-regular fa-copy"></i></button>
                     <button class="btn-info" onclick="event.preventDefault(); showNote('${link.id}')"><i class="fa-solid fa-circle-exclamation"></i></button>
                 </div>
@@ -208,7 +349,7 @@ document.getElementById('btn-login').addEventListener('click', () => {
         } else if (currentUser.role === 'admin') {
             document.querySelector('[data-tab="advanced"]').style.display = 'flex';
             document.getElementById('nav-tab-admin').style.display = 'flex';
-            currentTab = 'admin'; 
+            currentTab = 'basic'; 
         }
         
         // Trigger click on currentTab
@@ -246,6 +387,27 @@ function renderAdminTable() {
     tbody.innerHTML = '';
     
     localData.links.forEach(link => {
+        let timeText = link.createdAt || '-';
+        if (timeText !== '-') {
+            if (timeText.includes('/')) {
+                const parts = timeText.split('/');
+                if (parts.length === 3) {
+                    const d = parts[0].padStart(2, '0');
+                    const m = parts[1].padStart(2, '0');
+                    const y = parts[2].length === 4 ? parts[2].slice(-2) : parts[2];
+                    timeText = `${d}/${m}/${y}`;
+                }
+            } else {
+                const dateObj = new Date(timeText);
+                if (!isNaN(dateObj.getTime())) {
+                    const d = String(dateObj.getDate()).padStart(2, '0');
+                    const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+                    const y = String(dateObj.getFullYear()).slice(-2);
+                    timeText = `${d}/${m}/${y}`;
+                }
+            }
+        }
+        
         const tr = document.createElement('tr');
         tr.innerHTML = `
             <td><strong>${link.title}</strong></td>
@@ -260,7 +422,7 @@ function renderAdminTable() {
                 <div style="margin-top: 5px;">${(link.tags || []).map(t => `<span class="tag-pill">${t}</span>`).join(' ')}</div>
             </td>
             <td><span class="badge ${link.type}">${link.type === 'basic' ? 'Cơ bản' : 'Nâng cao'}</span></td>
-            <td>${link.createdAt || '-'}</td>
+            <td>${timeText}</td>
             <td class="action-btns">
                 <button class="btn-edit" onclick="editLink('${link.id}')"><i class="fa-solid fa-pen"></i></button>
                 <button class="btn-delete" onclick="deleteLink('${link.id}')"><i class="fa-solid fa-trash"></i></button>
@@ -381,18 +543,20 @@ document.getElementById('btn-save-modal').addEventListener('click', () => {
         const index = localData.links.findIndex(l => l.id === id);
         if (index !== -1) {
             const oldCreatedAt = localData.links[index].createdAt || new Date().toLocaleDateString('vi-VN');
-            localData.links[index] = { id, title, url, desc, note, tags, type, icon, createdAt: oldCreatedAt };
+            const starred = localData.links[index].starred || false;
+            localData.links[index] = { id, title, url, desc, note, tags, type, icon, createdAt: oldCreatedAt, starred };
         }
     } else {
         // Add new
         const newId = Date.now().toString();
-        const createdAt = new Date().toLocaleDateString('vi-VN');
-        localData.links.push({ id: newId, title, url, desc, note, tags, type, icon, createdAt });
+        const d = new Date();
+        const createdAt = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getFullYear()).slice(-2)}`;
+        localData.links.push({ id: newId, title, url, desc, note, tags, type, icon, createdAt, starred: false });
     }
     
     modal.classList.remove('active');
     renderAdminTable();
-    // also update current view if needed, but since we are in admin view, it's fine.
+    autoSaveToCloud();
 });
 
 window.editLink = function(id) {
@@ -437,6 +601,7 @@ window.deleteLink = function(id) {
     if(confirm('Bạn có chắc chắn muốn xóa link này?')) {
         localData.links = localData.links.filter(l => l.id !== id);
         renderAdminTable();
+        autoSaveToCloud();
     }
 };
 
@@ -487,6 +652,7 @@ document.getElementById('btn-save-user').addEventListener('click', () => {
     
     userModal.classList.remove('active');
     renderUsersTable();
+    autoSaveToCloud();
 });
 
 window.editUser = function(id) {
@@ -511,25 +677,48 @@ window.deleteUser = function(id) {
     if(confirm('Bạn có chắc chắn muốn xóa User này?')) {
         localData.users = localData.users.filter(u => u.id !== id);
         renderUsersTable();
+        autoSaveToCloud();
     }
 };
 
-// Export Data
-document.getElementById('btn-export-data').addEventListener('click', () => {
-    const dataString = `const appData = ${JSON.stringify(localData, null, 4)};`;
-    
-    const blob = new Blob([dataString], { type: 'text/javascript' });
-    const url = URL.createObjectURL(blob);
-    
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'data.js';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    
-    alert('Đã tải xuống data.js! Vui lòng copy file này đè lên file cũ trong thư mục dự án.');
+// Export / Save Data to Cloud
+document.getElementById('btn-export-data').addEventListener('click', async () => {
+    if (typeof GOOGLE_SHEET_API_URL !== 'undefined' && GOOGLE_SHEET_API_URL.trim() !== "") {
+        showLoader("Đang lưu dữ liệu lên Cloud...");
+        try {
+            const res = await fetch(GOOGLE_SHEET_API_URL, {
+                method: 'POST',
+                body: JSON.stringify(localData)
+            });
+            const result = await res.json();
+            if (result.status === "success") {
+                alert("Đã lưu dữ liệu lên Cloud thành công!");
+            } else {
+                alert("Lỗi khi lưu dữ liệu: " + (result.message || "Không xác định"));
+            }
+        } catch (err) {
+            console.error(err);
+            alert("Lỗi kết nối: Không thể lưu dữ liệu!");
+        } finally {
+            hideLoader();
+        }
+    } else {
+        // Fallback fallback tải file nếu chưa có API
+        const dataString = `// Thay đường link Google Apps Script Web App của bạn vào đây\nconst GOOGLE_SHEET_API_URL = "";\n\nconst appData = ${JSON.stringify(localData, null, 4)};`;
+        
+        const blob = new Blob([dataString], { type: 'text/javascript' });
+        const url = URL.createObjectURL(blob);
+        
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'data.js';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        alert('Chưa cấu hình API. Đã tải xuống data.js!');
+    }
 });
 
 // Allow Enter key to login
